@@ -1,0 +1,102 @@
+import numpy as np
+import console
+import time
+start =time.perf_counter() #计时
+
+with open('E:/old.txt', 'r',encoding='utf-8') as f:
+    a= f.read()
+    print(a)
+
+print(f.closed)
+
+
+#分别读取txt
+import glob
+path_file_number=glob.glob('E:/ref/*.txt')#或者指定文件下个数
+#path_file_number=glob.glob(pathname='*.txt') #获取当前文件夹下个数
+n=len(path_file_number)
+
+b=np.zeros(n,int)
+b=list(b)
+for j in range(0,n):
+    b[j]=j
+    
+
+for i in range(0,n):
+ s=str(i)
+ with open('E:\\ref\\'+s+'.txt', 'r',encoding='utf-8') as f:
+     #b[i]=str(b[i])
+     b[i]= f.read()
+     print(b[i])
+     print(f.closed)
+
+for m in range(0,n):
+  for k in range(2,8):
+    for i in range(0,len(a)):
+      for j in range(0,len(b[m])):
+        if a[i:i+k]==b[m][j:j+k] and i+k<len(a):
+          t=str(i)
+          s=str(i+k)
+          v=str(m)
+          jg=open(r'E:\\sj\\sj'+v+'.txt','a+')
+          jg.write(t+' '+s+'\n')
+          jg.close() 
+          
+              
+
+def loadData(file):
+  inFile = open(file, 'r')
+  X = [ ]
+  y = [ ]
+  for line in inFile:
+    trainingSet = line.split(' ') 
+    X.append(trainingSet[0]) 
+    y.append(trainingSet[1])
+  return(X,y)
+
+c=''
+for i in range(0,n):
+  c=c+str(i)
+
+c=list(c)
+for m in range(0,n):
+  v=str(m)
+  (X,y)=loadData('E:\sj\sj'+v+'.txt')
+  x=np.array(X)
+  y=np.array(y)
+  z=np.vstack((x,y))
+  z=np.transpose(z)
+  z=sorted(z, key=lambda x:(int(x[0]),int(x[1])))
+  u=np.zeros(len(X),int)
+  u=list(u)
+  for i in range(0,len(X)):
+    X[i]=z[i][0]
+    u[i]=z[i][1]
+  y=u
+  t=len(X)
+  s=0
+  for o in range(1,t):
+    p=o-s
+    if int(X[p])<int(y[p-1]):
+      y[p-1]=y[p]
+      X.pop(p)
+      y.pop(p)
+      s=s+1
+  s1=0
+  for  i in range(0,len(X)): #把a中重复的删除，比如a[29:31]与a[68:70]重复，那么我们就删除X，y中的[68:70]，因为换颜色功能中，替换时，是替换的a[i]对应的字符串，比如a[i]='五'，那么就把文章中所有‘五’都替换了，所以要删除重复的，仅保留第一个：为了保证从小到大顺序，不出乱。
+    for j in range(1,len(X)):
+      j=j-s1
+      if  i+j<len(X):
+        if a[int(X[i]):int(y[i])]==a[int(X[i+j]):int(y[i+j])]:
+          X.pop(i+j)
+          y.pop(i+j)
+          s1=s1+1
+  c[m]=a
+  for i in range(0,len(X)):
+    c[m]=c[m].replace(c[m][14*i+int(X[i]):14*i+int(y[i])],'\033[1;31;40m%s\033[0m' % c[m][14*i+int(X[i]):14*i+int(y[i])])
+    print(c[m])
+
+
+end = time.perf_counter() #计时结束
+print('Running time: %s Seconds'%(end-start))
+
